@@ -29,6 +29,8 @@
 
 ### Usage
 
+#### Install
+
 ```bash
   pnpm i
 ```
@@ -44,6 +46,25 @@ mahiro.use(PJSK())
 ```
 
 注：如需精确定位和配置，请修改 [`node/src/info.ts#characterSpecifiedConfig`](./node/src/info.ts) 。
+
+#### Trigger
+
+触发命令格式：
+
+```bash
+  pjsk {表情包ID} {文字}
+```
+
+e.g.
+
+```bash
+  # 普通例子
+  pjsk ena 不行，我在玩原神
+  
+  # 换行的例子
+  pjsk nene11 我心脏弱
+死给你看
+```
 
 ### Thanks/Inspiration
 
