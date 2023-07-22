@@ -41,7 +41,7 @@ interface IFile {
   path: string
 }
 
-const pjskAssetsRoot = join(
+const pjskAssetsRoot = process.env.PJSK_ASSETS_IMAGES_DIR || join(
   dirname(require.resolve('pjsk-assets/package.json')),
   './src/images'
 )
@@ -90,8 +90,8 @@ const fontNameForFallback = 'pjsk'
 const fontNameForMain = 'yyy'
 const fontFamily = `${fontNameForMain},${fontNameForFallback}`
 const registerFonts = () => {
-  const fontPathForFallback = require.resolve('pjsk-assets/fonts/font.ttf')
-  const fontPathForMainSource = require.resolve('pjsk-assets/fonts/y.base64')
+  const fontPathForFallback = join(pjskAssetsRoot, '../fonts/font.ttf')
+  const fontPathForMainSource = join(pjskAssetsRoot, '../fonts/y.base64')
   const fontPathForMain = fontPathForMainSource.replace('.base64', '.otf')
   function initFont() {
     if (existsSync(fontPathForMain)) {
