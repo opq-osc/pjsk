@@ -41,7 +41,10 @@ interface IFile {
   path: string
 }
 
-const pjskAssetsRoot = join(__dirname, '../../assets/src/images')
+const pjskAssetsRoot = join(
+  dirname(require.resolve('pjsk-assets/package.json')),
+  './src/images'
+)
 const loadAllFiles = () => {
   const files: IFile[] = []
   const dirs = readdirSync(pjskAssetsRoot).filter((file) => {
