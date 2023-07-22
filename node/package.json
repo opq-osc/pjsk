@@ -1,0 +1,19 @@
+{
+  "name": "pjsk-node",
+  "private": true,
+  "version": "1.0.0",
+  "exports": {
+    "./package.json": "./package.json",
+    "./*": "./src/*.ts"
+  },
+  "dependencies": {
+    "canvas": "^2.11.2",
+    "deepmerge": "^4.3.1",
+    "fabric": "^5.3.0",
+    "image-size": "^1.0.2",
+    "pjsk-assets": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/fabric": "^5.3.3"
+  }
+}
