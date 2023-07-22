@@ -54,6 +54,15 @@ e.g.
 死给你看
 ```
 
+### Troubleshooting
+
+`canvas` 依赖安装太慢：
+
+```bash
+# .npmrc
+canvas_binary_host_mirror=https://registry.npmmirror.com/-/binary/canvas
+```
+
 ### Thanks/Inspiration
 
  - [Sekai Stickers](https://st.ayaka.one/)
