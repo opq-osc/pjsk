@@ -1,0 +1,8 @@
+{
+  "extends": "@xn-sakina/mental/lib",
+  "compilerOptions": {
+    "paths": {
+      "pjsk-node/*": ["../node/src/*"]
+    }
+  }
+}
