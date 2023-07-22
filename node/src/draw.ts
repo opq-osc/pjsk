@@ -104,14 +104,10 @@ const registerFonts = () => {
   // @ts-ignore
   fabric.nodeCanvas.registerFont(fontPathForFallback, {
     family: fontNameForFallback,
-    weight: 'regular',
-    style: 'normal',
   })
   // @ts-ignore
   fabric.nodeCanvas.registerFont(fontPathForMain, {
     family: fontNameForMain,
-    weight: 'regular',
-    style: 'normal',
   })
 }
 
