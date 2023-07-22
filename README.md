@@ -4,19 +4,12 @@
 
 ### Preview
 
-<img src="https://cdn.jsdelivr.net/gh/opq-osc/pjsk@main/preview/0.jpg" width="15%" />
-<img src="https://cdn.jsdelivr.net/gh/opq-osc/pjsk@main/preview/1.jpg" width="15%" />
-<img src="https://cdn.jsdelivr.net/gh/opq-osc/pjsk@main/preview/2.jpg" width="15%" />
-<img src="https://cdn.jsdelivr.net/gh/opq-osc/pjsk@main/preview/3.jpg" width="15%" />
-<img src="https://cdn.jsdelivr.net/gh/opq-osc/pjsk@main/preview/4.jpg" width="15%" />
-<img src="https://cdn.jsdelivr.net/gh/opq-osc/pjsk@main/preview/5.jpg" width="15%" />
-
-<!-- <img src="./preview/0.jpg" width="15%" />
+<img src="./preview/0.jpg" width="15%" />
 <img src="./preview/1.jpg" width="15%" />
 <img src="./preview/2.jpg" width="15%" />
 <img src="./preview/3.jpg" width="15%" />
 <img src="./preview/4.jpg" width="15%" />
-<img src="./preview/5.jpg" width="15%" /> -->
+<img src="./preview/5.jpg" width="15%" />
 
 ### Directory
 
