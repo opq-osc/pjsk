@@ -1,0 +1,6 @@
+packages:
+ - ./compress
+ - ./assets
+ - ./node
+ - ./mahiro
+ 
