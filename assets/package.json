@@ -1,0 +1,9 @@
+{
+  "name": "pjsk-assets",
+  "version": "1.0.0",
+  "private": true,
+  "exports": {
+    "./package.json": "./package.json",
+    "./*": "./src/*"
+  }
+}
