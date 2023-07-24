@@ -5,7 +5,7 @@ import 'zx/globals'
 // for tests
 const testOpts = {
   // maxCase: `什么时候禁止男的发这种表情包`,
-  normalCase: `虾头男\n小红书见`,
+  // normalCase: `虾头男\n小红书见`,
   // minCase: `已黑化`,
   // fourCase: `全部超飞`,
   // suo: `让我索一口嘛`,
@@ -45,7 +45,7 @@ const runUnit = async ({ name, text }: { name: string, text?: string }) => {
 }
 
 const run = async () => {
-  await runUnit({ name: 'ena', text: testOpts.normalCase })
+  // await runUnit({ name: 'ena', text: testOpts.normalCase })
   // await runUnit({ name: 'mizuki14' })
   // await runUnit({ name: 'mizuki13' })
   // await runUnit({ name: 'mizuki16' })
@@ -63,6 +63,7 @@ const run = async () => {
   // await runUnit({ name: 'Mizuki', text: '我心脏弱\n死给你看' })
   // await runUnit({ name: 'Nene_11', text: '一群郭楠\n避雷了' })
   // await runUnit({ name: 'Emu_7', text: '没人撅我\n   好无聊...' })
+  await runUnit({ name: 'ena', text: '虾头男收收味' })
   // await runUnit({ name: 'Kohane_11', text: '可以草你吗' })
 }
 

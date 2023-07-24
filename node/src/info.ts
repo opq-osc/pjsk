@@ -15,6 +15,7 @@ export const params = {
     offLength: -8,
     tryMoveDistance: 10,
     veryEdgeLimit: 15,
+    twoLineAutoMoveLength: 2
   },
 } as const
 

@@ -272,7 +272,7 @@ export const draw = async (opts: IOpts): Promise<void> => {
   let fontSize = startFontSize
   const xWeight = pos.x
   const yWeight = pos.y
-  const widthWeight = pos.w
+  let widthWeight = pos.w
   let top = canvasHeight * yWeight
   let left = canvasWidth * xWeight
   const createText = () => {
@@ -307,7 +307,7 @@ export const draw = async (opts: IOpts): Promise<void> => {
 
   let text = createText()
 
-  // multi lines support
+  // improve 1: multi lines support
   const maxTextLength = textMaxLength
   while (text.__lineHeights?.length > 2) {
     // reduce font size
@@ -326,64 +326,116 @@ export const draw = async (opts: IOpts): Promise<void> => {
     // recreate text
     text = createText()
   }
-  // edge detect
-  const matrix = text.calcTransformMatrix()
-  if (text.width && text.height) {
-    const getTopPoints = () => {
-      const leftTopPoint = fabric.util.transformPoint(
-        new fabric.Point(-text.width! / 2, -text.height! / 2),
-        matrix
-      )
-      const rightTopPoint = fabric.util.transformPoint(
-        new fabric.Point(text.width! / 2, -text.height! / 2),
-        matrix
-      )
-      return { leftTopPoint, rightTopPoint }
+
+  // improve 2: if the 2 line has little text, auto move to 1 line
+  const needMoveImprove = () => {
+    const has2Line = text.__lineHeights?.length === 2
+    if (!has2Line) {
+      return false
     }
-    const { offLength } = edgeDetect
-    let isTriedMoveRight = false
-    // if text top point has negative value, try move down
-    const tryMoveDown = () => {
-      const { leftTopPoint, rightTopPoint } = getTopPoints()
-      const hasNegative =
-        leftTopPoint.y < offLength || rightTopPoint.y < offLength
-      if (hasNegative) {
-        // move down
-        top += Math.abs(Math.min(leftTopPoint.y, rightTopPoint.y) - offLength)
-        text = createText()
-      }
+    const line2Text = text._textLines?.[1]
+    if (!line2Text?.length) {
+      return false
     }
-    // if left very edge, try move right
-    const tryMoveRight = () => {
-      const { leftTopPoint } = getTopPoints()
-      const hasVeryEdge = leftTopPoint.x < edgeDetect.veryEdgeLimit
-      if (hasVeryEdge) {
-        // move right
-        left += edgeDetect.tryMoveDistance
-        isTriedMoveRight = true
-        text = createText()
-      }
-    }
-    // if right very edge, try move left
-    const tryMoveLeft = () => {
-      const { rightTopPoint } = getTopPoints()
-      const hasVeryEdge =
-        rightTopPoint.x > canvasWidth - edgeDetect.veryEdgeLimit
-      if (hasVeryEdge) {
-        // move left
-        if (isTriedMoveRight) {
-          // half distance
-          left -= edgeDetect.tryMoveDistance / 2
-        } else {
-          left -= edgeDetect.tryMoveDistance
-        }
-        text = createText()
-      }
-    }
-    tryMoveRight()
-    tryMoveLeft()
-    tryMoveDown()
+    const needImprove = edgeDetect.twoLineAutoMoveLength >= line2Text.length
+    return needImprove
   }
+  if (needMoveImprove()) {
+    const originFontSize = fontSize
+    const originWidthWeight = widthWeight
+    const reset = () => {
+      fontSize = originFontSize
+      widthWeight = originWidthWeight
+    }
+    // first try reduce font size 1 time
+    fontSize -= fontConfig.reduceUnit
+    const newText = createText()
+    if (newText.__lineHeights?.length === 1) {
+      // that's ok !
+      text = newText
+    } else {
+      // second try expand width
+      const expandedWidthWeight = widthWeight * 1.1
+      if (expandedWidthWeight >= 1) {
+        // not good
+        // give up
+        reset()
+      } else {
+        widthWeight = expandedWidthWeight
+        const newText = createText()
+        if (newText.__lineHeights?.length === 1) {
+          // that's ok !
+          text = newText
+        } else {
+          // give up
+          reset()
+          // TODO: more improve
+        }
+      }
+    }
+  }
+
+  // improve 3: edge detect
+  const getTopPoints = () => {
+    const matrix = text.calcTransformMatrix()
+    const leftTopPoint = fabric.util.transformPoint(
+      new fabric.Point(-text.width! / 2, -text.height! / 2),
+      matrix
+    )
+    const rightTopPoint = fabric.util.transformPoint(
+      new fabric.Point(text.width! / 2, -text.height! / 2),
+      matrix
+    )
+    return { leftTopPoint, rightTopPoint }
+  }
+  const edgeDetectImprove = () => {
+    if (text.width && text.height) {
+      const { offLength } = edgeDetect
+      let isTriedMoveRight = false
+      // if text top point has negative value, try move down
+      const tryMoveDown = () => {
+        const { leftTopPoint, rightTopPoint } = getTopPoints()
+        const hasNegative =
+          leftTopPoint.y < offLength || rightTopPoint.y < offLength
+        if (hasNegative) {
+          // move down
+          top += Math.abs(Math.min(leftTopPoint.y, rightTopPoint.y) - offLength)
+          text = createText()
+        }
+      }
+      // if left very edge, try move right
+      const tryMoveRight = () => {
+        const { leftTopPoint } = getTopPoints()
+        const hasVeryEdge = leftTopPoint.x < edgeDetect.veryEdgeLimit
+        if (hasVeryEdge) {
+          // move right
+          left += edgeDetect.tryMoveDistance
+          isTriedMoveRight = true
+          text = createText()
+        }
+      }
+      // if right very edge, try move left
+      const tryMoveLeft = () => {
+        const { rightTopPoint } = getTopPoints()
+        const hasVeryEdge =
+          rightTopPoint.x > canvasWidth - edgeDetect.veryEdgeLimit
+        if (hasVeryEdge) {
+          // move left
+          if (isTriedMoveRight) {
+            // half distance
+            left -= edgeDetect.tryMoveDistance / 2
+          } else {
+            left -= edgeDetect.tryMoveDistance
+          }
+          text = createText()
+        }
+      }
+      tryMoveRight()
+      tryMoveLeft()
+      tryMoveDown()
+    }
+  }
+  edgeDetectImprove()
 
   canvas.add(text)
   canvas.renderAll()
