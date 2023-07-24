@@ -4,6 +4,8 @@ import { join } from 'path'
 import { draw } from 'pjsk-node/draw'
 import { renderHelp } from 'pjsk-node/help'
 
+const HELP_KEYWORDS = ['help', '帮助', 'list', '列表'] as const
+
 export const PJSK = () => {
   const use: IMahiroUse = async (mahiro) => {
     const logger = mahiro.logger.withTag('pjsk') as typeof mahiro.logger
@@ -24,22 +26,39 @@ export const PJSK = () => {
 
       if (trimmed.startsWith('pjsk ')) {
         const msgWithoutPrefix = trimmed.slice('pjsk '.length)
-        const trimmedMsg = _.trim(msgWithoutPrefix)
+        const trimmedMsg = _.trim(msgWithoutPrefix) as string
         if (!trimmedMsg?.length) {
           return
         }
 
-        if (['help', '帮助', 'list', '列表'].includes(trimmedMsg)) {
+        const cacheDir = join(__dirname, 'cache')
+        if (!existsSync(cacheDir)) {
+          logger.info(`pjsk: create cache dir: ${cacheDir}`)
+          mkdirSync(cacheDir)
+        }
+
+        // help command
+        const isMatchHelpCmd = HELP_KEYWORDS.some(i => {
+          return trimmedMsg.toLowerCase() === i
+        })
+        if (isMatchHelpCmd) {
           try {
-            const cacheDir = join(__dirname, 'cache')
-            if (!existsSync(cacheDir)) {
-              mkdirSync(cacheDir)
+            const helpOutput = join(cacheDir, `help.png`)
+            logger.info(`pjsk: start render help...`)
+            await renderHelp(helpOutput)
+            logger.info(`pjsk: render help done, output: ${helpOutput}`)
+
+            if (!existsSync(helpOutput)) {
+              logger.error(
+                `pjsk: render help not cause error, but not found output (${helpOutput})`
+              )
+              return
             }
-            const output = join(cacheDir, `help.png`)
-            await renderHelp(output)
+
+            // send image
             await mahiro.sendGroupMessage({
               groupId: useful.groupId,
-              fastImage: output,
+              fastImage: helpOutput,
             })
           } catch (e) {
             logger.error(`pjsk: render help error: ${e}`)
@@ -47,6 +66,7 @@ export const PJSK = () => {
           return
         }
 
+        // render command
         const firstSpaceIndex = trimmedMsg.indexOf(' ')
         const cmd = trimmedMsg.slice(0, firstSpaceIndex)
         const text = trimmedMsg.slice(firstSpaceIndex + 1)
@@ -62,10 +82,6 @@ export const PJSK = () => {
         )
         logger.info(`pjsk: start render...`)
         try {
-          const cacheDir = join(__dirname, 'cache')
-          if (!existsSync(cacheDir)) {
-            mkdirSync(cacheDir)
-          }
           const { userId, groupId } = useful
           const output = join(cacheDir, `${userId}.jpg`)
           await draw({
