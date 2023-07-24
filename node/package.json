@@ -8,6 +8,7 @@
   },
   "dependencies": {
     "canvas": "^2.11.2",
+    "dayjs": "^1.11.9",
     "deepmerge": "^4.3.1",
     "fabric": "^5.3.0",
     "image-size": "^1.0.2",
