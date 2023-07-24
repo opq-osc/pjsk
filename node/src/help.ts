@@ -15,6 +15,15 @@ const template = /* html */ `
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Document</title>
   <style>
+  body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+      'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+      sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
   @font-face {
     font-family: 'pjsk';
     src: url(data:font/truetype;charset=utf-8;base64,{{fontData}}) format('truetype');
@@ -33,7 +42,12 @@ const template = /* html */ `
     width: 1080px;
     height: 1000px;
     padding: 20px;
-    font-family: "pjsk";
+  }
+
+  .pjsk-font {
+    font-family: "pjsk", -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+      'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+      sans-serif;
   }
   
   body .root .title {
@@ -41,13 +55,19 @@ const template = /* html */ `
     width: 100%;
     text-align: center;
     padding: 7px;
+    margin-bottom: 3px;
   }
   
   body .root .tip,
   body .root .helper {
     color: #fefefe;
     font-size: 22px;
-    padding: 10px;
+    margin-bottom: 6px;
+  }
+
+  .helper {
+    padding: 0;
+    margin-bottom: 10px;
   }
   
   body .root .list {
@@ -104,15 +124,11 @@ const template = /* html */ `
     width: 150px;
     height: 120px;
   }
-
-  img {
-    max-width: 100%;
-  }
   </style>
 </head>
 
 <body>
-  <div class="root">
+  <div class="root pjsk-font">
     <div class="title">pjsk(啤酒烧烤)</div>
     <div class="tip">食用方法：发送 「pjsk 角色id 内容」生成表情</div>
     <div class="list-wrapper">
@@ -152,7 +168,8 @@ async function render(html: string, outputPath: string) {
 
 export async function renderHelp(outputPath: string) {
   // cache
-  if (existsSync(outputPath)) {
+  const useCache = process.env.PJSK_RENDER_CACHE !== 'none'
+  if (useCache && existsSync(outputPath)) {
     const stats = statSync(outputPath)
     const createTime = stats.mtime
     // 10 hours
@@ -212,9 +229,9 @@ export async function renderHelp(outputPath: string) {
 
   let previewData = ''
   const previewList: string[] = [
-    'pjsk ena 虾头男\n小红书见',
-    'pjsk Nene_11 一群郭楠\n避雷了',
-    'pjsk Mizuki 我心脏弱\n死给你看',
+    'pjsk ena 虾头男<br/>小红书见',
+    'pjsk Nene_11 一群郭楠<br/>避雷了',
+    'pjsk Mizuki 我心脏弱<br/>死给你看',
     'pjsk Honami16 要当我的小狗吗',
     'pjsk Mizuki14 什么时候禁止男的发这种表情包',
     'pjsk airi11 让我索一口嘛',
@@ -227,7 +244,7 @@ export async function renderHelp(outputPath: string) {
     previewData += /* html */ `
 <span class="item">
   <img src="data:image/png;base64,${imageBase64}" />
-  <pre>${item}</pre>
+  <span>${item}</span>
 </span>`
   })
   html = html.replace('{{previewData}}', previewData)
