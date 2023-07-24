@@ -4,7 +4,14 @@
 
 ## Preview
 
-<img src="./preview/0.jpg" width="15%" /><img src="./preview/1.jpg" width="15%" /><img src="./preview/2.jpg" width="15%" /><img src="./preview/3.jpg" width="15%" /><img src="./preview/4.jpg" width="15%" /><img src="./preview/5.jpg" width="15%" />
+<img src="./preview/0.jpg" width="20%" /><img src="./preview/1.jpg" width="20%" /><img src="./preview/2.jpg" width="20%" />
+
+<img src="./preview/3.jpg" width="20%" /><img src="./preview/4.jpg" width="20%" /><img src="./preview/5.jpg" width="20%" />
+
+<details>
+<summary>查看帮助一栏图</summary>
+<img src="https://cdn.jsdelivr.net/gh/fz6m/Private-picgo@moe-2021/img/20230725011706.webp" width="50%" />
+</details>
 
 ## Directory
 
@@ -41,6 +48,7 @@ mahiro.use(PJSK())
 
 ```bash
   pjsk {表情包ID} {文字}
+  pjsk help
 ```
 
 e.g.
