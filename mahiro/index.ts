@@ -2,6 +2,7 @@ import { existsSync, mkdirSync } from 'fs'
 import { IMahiroUse } from 'mahiro'
 import { join } from 'path'
 import { draw } from 'pjsk-node/draw'
+import { renderHelp } from 'pjsk-node/help'
 
 export const PJSK = () => {
   const use: IMahiroUse = async (mahiro) => {
@@ -27,12 +28,31 @@ export const PJSK = () => {
         if (!trimmedMsg?.length) {
           return
         }
+
+        if (['help', '帮助', 'list', '列表'].includes(trimmedMsg)) {
+          try {
+            const cacheDir = join(__dirname, 'cache')
+            if (!existsSync(cacheDir)) {
+              mkdirSync(cacheDir)
+            }
+            const output = join(cacheDir, `help.png`)
+            await renderHelp(output)
+            await mahiro.sendGroupMessage({
+              groupId: useful.groupId,
+              fastImage: output,
+            })
+          } catch (e) {
+            logger.error(`pjsk: render help error: ${e}`)
+          }
+          return
+        }
+
         const firstSpaceIndex = trimmedMsg.indexOf(' ')
         const cmd = trimmedMsg.slice(0, firstSpaceIndex)
         const text = trimmedMsg.slice(firstSpaceIndex + 1)
         const trimmedCmd = _.trim(cmd) as string
         const trimmedText = _.trim(text).replace(/\r/, '\n') as string
-        
+
         if (!trimmedCmd?.length || !trimmedText?.length) {
           return
         }
