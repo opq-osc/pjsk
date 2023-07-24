@@ -11,6 +11,7 @@
     "deepmerge": "^4.3.1",
     "fabric": "^5.3.0",
     "image-size": "^1.0.2",
+    "node-html-to-image": "^3.3.0",
     "pjsk-assets": "workspace:*"
   },
   "devDependencies": {
