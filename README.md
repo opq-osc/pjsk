@@ -10,7 +10,7 @@
 
 <details>
 <summary>查看帮助一栏图</summary>
-<img src="https://cdn.jsdelivr.net/gh/fz6m/Private-picgo@moe-2021/img/20230725011706.webp" width="50%" />
+<img src="https://cdn.jsdelivr.net/gh/fz6m/Private-picgo@moe-2021/img/20230725011706.webp" width="70%" />
 </details>
 
 ## Directory
