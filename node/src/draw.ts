@@ -1,7 +1,14 @@
 import { fabric } from 'fabric'
 import { basename, dirname, isAbsolute, join } from 'path'
 import imageSize from 'image-size'
-import { createWriteStream, existsSync, readFileSync, readdirSync, statSync, writeFileSync } from 'fs'
+import {
+  createWriteStream,
+  existsSync,
+  readFileSync,
+  readdirSync,
+  statSync,
+  writeFileSync,
+} from 'fs'
 import {
   configs,
   characterSpecifiedConfig,
@@ -12,6 +19,7 @@ import {
   params,
 } from './info'
 import deepmerge from 'deepmerge'
+import { pjskAssetsRoot, getValue } from './shared'
 
 enum EFormat {
   jpg = 'jpg',
@@ -41,10 +49,6 @@ interface IFile {
   path: string
 }
 
-const pjskAssetsRoot = process.env.PJSK_ASSETS_IMAGES_DIR || join(
-  dirname(require.resolve('pjsk-assets/package.json')),
-  './src/images'
-)
 const loadAllFiles = () => {
   const files: IFile[] = []
   const dirs = readdirSync(pjskAssetsRoot).filter((file) => {
@@ -143,7 +147,7 @@ export const draw = async (opts: IOpts): Promise<void> => {
   }
 
   // NOTE: we can not try file, will be injected in runtime
-  const trimmedCharacter = character?.trim()?.toLowerCase()?.replace('_', '');
+  const trimmedCharacter = character?.trim()?.toLowerCase()?.replace('_', '')
   if (!trimmedCharacter?.length) {
     throw new Error('character is required')
   }
@@ -363,12 +367,13 @@ export const draw = async (opts: IOpts): Promise<void> => {
     // if right very edge, try move left
     const tryMoveLeft = () => {
       const { rightTopPoint } = getTopPoints()
-      const hasVeryEdge = rightTopPoint.x > (canvasWidth - edgeDetect.veryEdgeLimit)
+      const hasVeryEdge =
+        rightTopPoint.x > canvasWidth - edgeDetect.veryEdgeLimit
       if (hasVeryEdge) {
         // move left
         if (isTriedMoveRight) {
           // half distance
-          left -= (edgeDetect.tryMoveDistance / 2)
+          left -= edgeDetect.tryMoveDistance / 2
         } else {
           left -= edgeDetect.tryMoveDistance
         }
@@ -391,9 +396,9 @@ export const draw = async (opts: IOpts): Promise<void> => {
   // canvas.renderAll()
 
   // write
-  let resolve: (v: unknown) => void
+  let resolve: () => void
   let reject: (v: unknown) => void
-  const promise = new Promise((_resolve, _reject) => {
+  const promise = new Promise<void>((_resolve, _reject) => {
     resolve = _resolve
     reject = _reject
   })
@@ -412,7 +417,7 @@ export const draw = async (opts: IOpts): Promise<void> => {
       reject(new Error(`PJSK: draw write error ${outputPath} not exists`))
       return
     }
-    resolve(null)
+    resolve()
   })
   // error
   writeStream.on('error', (err) => {
@@ -421,15 +426,4 @@ export const draw = async (opts: IOpts): Promise<void> => {
   })
 
   return promise
-}
-
-function getValue<K, T extends Record<string, K> = any>(obj: T, key: string) {
-  const keys = Object.keys(obj)
-  const matchedKey = keys.find((k) => {
-    return k.toLowerCase() === key.toLowerCase()
-  })
-  if (!matchedKey) {
-    return
-  }
-  return obj[matchedKey]
 }

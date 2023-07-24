@@ -1,18 +1,14 @@
-import { IConfig, configs } from "./info"
-import { dirname, join } from "path"
-import { existsSync, promises, readFileSync, statSync } from "fs"
+import { IConfig, configs } from './info'
+import { join } from 'path'
+import { existsSync, readFileSync, statSync } from 'fs'
+import { readdir } from 'fs/promises'
+import { getValue, pjskAssetsRoot } from './shared'
+import nodeHtmlToImage from 'node-html-to-image'
+import dayjs from 'dayjs'
 
-import { getValue } from './draw'
-import nodeHtmlToImage from "node-html-to-image"
-
-const pjskAssetsRoot = process.env.PJSK_ASSETS_IMAGES_DIR || join(
-  dirname(require.resolve('pjsk-assets/package.json')),
-  './src/images'
-)
-
-const template = `
+const template = /* html */ `
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-CN">
 
 <head>
   <meta charset="UTF-8">
@@ -108,7 +104,10 @@ const template = `
     width: 150px;
     height: 120px;
   }
-  
+
+  img {
+    max-width: 100%;
+  }
   </style>
 </head>
 
@@ -134,75 +133,103 @@ const template = `
 </html>
 `
 
-export const render = async (html: string, outputPath: string) => {
+async function render(html: string, outputPath: string) {
   const buffer = await nodeHtmlToImage({
     html: html,
     output: outputPath,
     puppeteerArgs: {
       args: [
-        '--no-sandbox', '--disable-setuid-sandbox', '--font-render-hinting=none'
-      ]
-    }
+        '--no-sandbox',
+        '--disable-setuid-sandbox',
+        // why we need this?
+        '--font-render-hinting=none',
+      ],
+    },
   })
 
   return buffer
 }
 
-export async function renderHelp (outputPath: string) {
+export async function renderHelp(outputPath: string) {
   // cache
   if (existsSync(outputPath)) {
     const stats = statSync(outputPath)
-    const createTime = stats.ctime.getTime()
-    const now = new Date().getTime()
-    // 1h
-    if ((now - createTime) / 1000 < 3600) {
+    const createTime = stats.mtime
+    // 10 hours
+    const isCacheValid = dayjs().diff(createTime, 'hour') < 10
+    if (isCacheValid) {
       return
     }
   }
-  const files = await promises.readdir(pjskAssetsRoot)
+  const dirs = (await readdir(pjskAssetsRoot)).filter((i) => {
+    if (i === '.DS_Store') {
+      return false
+    }
+    const isDir = statSync(join(pjskAssetsRoot, i)).isDirectory()
+    if (!isDir) {
+      return false
+    }
+    return true
+  })
   let html = template
   const fontPath = join(pjskAssetsRoot, '../fonts/font.ttf')
-  const fontBuffer = readFileSync(fontPath)
-  const fontData = fontBuffer.toString('base64')
-  html = html.replace('{{fontData}}', fontData)
+  const fontBase64 = readFileSync(fontPath, 'base64')
+  html = html.replace('{{fontData}}', fontBase64)
 
   let listData = ''
-  for (const item of files) {
-    const itemPath = join(pjskAssetsRoot, item)
-    const files = await promises.readdir(itemPath)
-    const imageBuffer = readFileSync(join(itemPath, files[Math.floor(files.length * Math.random())]))
-    const data = imageBuffer.toString('base64')
-    const characterDefaultConfig = getValue<IConfig>(
-      configs,
-      item
+  for (const dir of dirs) {
+    const dirPath = join(pjskAssetsRoot, dir)
+    const files = (await readdir(dirPath)).filter((i) => {
+      if (i === '.DS_Store') {
+        return false
+      }
+      const isFile = statSync(join(dirPath, i)).isFile()
+      if (!isFile) {
+        return false
+      }
+      const isImage = i.endsWith('.png') || i.endsWith('.jpg')
+      if (!isImage) {
+        return false
+      }
+      return true
+    })
+    const randomImagePath = join(
+      dirPath,
+      files[Math.floor(files.length * Math.random())]
     )
-    listData += `<span class="item" style="color: ${characterDefaultConfig?.color}">
-    <img src="data:image/png;base64, ${data}" />
-    <span>${item}</span>
-    <span>1-${files.length}</span>
-    </span>`
+    const imageBase64 = readFileSync(randomImagePath, 'base64')
+    const characterDefaultConfig = getValue<IConfig>(configs, dir)
+    listData += /* html */ `
+<span class="item" style="color: ${characterDefaultConfig!.color}">
+  <img src="data:image/png;base64,${imageBase64}" />
+  <span>${dir}</span>
+  <span>1-${files.length}</span>
+</span>
+`
   }
 
   html = html.replace('{{listData}}', listData)
 
   let previewData = ''
-  const previewList = [
+  const previewList: string[] = [
     'pjsk ena 虾头男\n小红书见',
     'pjsk Nene_11 一群郭楠\n避雷了',
     'pjsk Mizuki 我心脏弱\n死给你看',
     'pjsk Honami16 要当我的小狗吗',
     'pjsk Mizuki14 什么时候禁止男的发这种表情包',
-    'pjsk airi11 让我索一口嘛'
+    'pjsk airi11 让我索一口嘛',
   ]
-  previewList.map((item, index) => {
-    const imageBuffer = readFileSync(join(__dirname, '..', '..', 'preview', index + '.jpg'))
-    const data = imageBuffer.toString('base64')
-    previewData += `<span class="item">
-    <img src="data:image/png;base64, ${data}" />
-    <span>${item}</span>
-    </span>`
+  previewList.forEach((item, index) => {
+    const imageBase64 = readFileSync(
+      join(__dirname, '..', '..', 'preview', index + '.jpg'),
+      'base64'
+    )
+    previewData += /* html */ `
+<span class="item">
+  <img src="data:image/png;base64,${imageBase64}" />
+  <pre>${item}</pre>
+</span>`
   })
   html = html.replace('{{previewData}}', previewData)
   await render(html, outputPath)
 }
-
