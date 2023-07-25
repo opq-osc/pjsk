@@ -3,9 +3,12 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "build": "tsx ./src/index.ts"
+    "build": "tsx ./src/index.ts",
+    "resize": "tsx ./src/resize.ts"
   },
   "devDependencies": {
+    "@napi-rs/image": "^1.6.1",
+    "image-size": "^1.0.2",
     "pjsk-assets": "workspace:*",
     "ttf2woff2": "^5.0.0"
   }
