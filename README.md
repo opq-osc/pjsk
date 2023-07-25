@@ -93,7 +93,7 @@ canvas_binary_host_mirror=https://registry.npmmirror.com/-/binary/canvas
       fc-cache -fv
     ```
 
-4. 修改 `node/src/draw.ts` 中的两处代码:
+4. 修改 `node/src/draw.ts` 中的 `3` 处代码:
 
     ```diff
     -const fontNameForFallback = 'pjsk'
@@ -106,6 +106,10 @@ canvas_binary_host_mirror=https://registry.npmmirror.com/-/binary/canvas
 
     ```diff
     -registerFonts()
+    ```
+
+    ```diff
+    -fontWeight: 800,
     ```
 
 5. 重启 mahiro ，再次尝试。
