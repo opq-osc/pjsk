@@ -2,6 +2,15 @@
 
 啤酒烧烤表情生成通用版。
 
+<div align="center">
+
+### ❗️EOL
+
+项目可正常运作，但不再提供维护，如有自定义需求可 fork 使用
+
+</div>
+
+
 ## Preview
 
 <img src="./preview/0.jpg" width="20%" /><img src="./preview/1.jpg" width="20%" /><img src="./preview/2.jpg" width="20%" />
@@ -29,6 +38,22 @@
 ```bash
   pnpm i
 ```
+
+### API
+
+```ts
+import { draw } from 'pjsk-node'
+//                   ^ workspace name 
+//                     relative path: './node/src'
+
+await draw({
+  text: '文字',
+  character: 'ena',
+  output: path.join(__dirname, './output.png')
+})
+```
+
+### Mahiro Plugin
 
 mahiro 直接导入插件使用：
 
